@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import se.iths.sofia.springauthenticator2fa.security.CustomAuthenticationSuccessHandler;
+import se.iths.sofia.springauthenticator2fa.security.TwoFactorFilter;
 
 
 @Configuration
@@ -19,7 +21,7 @@ import se.iths.sofia.springauthenticator2fa.security.CustomAuthenticationSuccess
 public class SecurityConfig {
 
     private final CustomAuthenticationSuccessHandler successHandler;
-
+    private final TwoFactorFilter twoFactorFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,6 +41,7 @@ public class SecurityConfig {
                         .successHandler(successHandler)
                         .permitAll()
                 )
+                .addFilterBefore(twoFactorFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

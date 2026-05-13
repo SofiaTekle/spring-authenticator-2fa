@@ -26,15 +26,20 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                                         Authentication authentication) throws IOException, ServletException {
         String username = authentication.getName();
 
-
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow();
 
+        HttpSession session = request.getSession();
+
         if (user.isTwoFactorEnabled()) {
-            HttpSession session = request.getSession();
             session.setAttribute("username_2fa", username);
+            session.setAttribute("two_factor_verified", false);
+            session.setAttribute("requires_2fa", true);
             response.sendRedirect("/verify-2fa");
         } else {
+            // Användare utan 2FA markeras som verifierade direkt
+            session.setAttribute("two_factor_verified", true);
+            session.setAttribute("requires_2fa", false);
             response.sendRedirect("/home");
         }
 

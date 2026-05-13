@@ -72,9 +72,13 @@ public class AuthController {
 
         AppUser appUser = appUserRepository.findByUsername(username).orElseThrow();
 
-
         if (totpService.isCodeValid(appUser.getSecret(), code)) {
+
+            // användaren är nu verifierad
+            session.setAttribute("two_factor_verified", true);
+
             session.removeAttribute("username_2fa");
+
             return "redirect:/home";
         }
 
